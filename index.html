@@ -76,7 +76,7 @@
         <button id="btn-entrar" onclick="comenzar()">Encender mi universo</button>
     </div>
 
-    <div id="guia">Arrastra suavemente • Toca el Sol del centro</div>
+    <div id="guia">Desliza para explorar • Toca el Sol del centro</div>
 
     <div id="carta" class="oculto">
         <div class="contenedor-carta">
@@ -116,8 +116,12 @@
     <script>
         let escena, camara, render, sol, grupoPalabras;
         let audioCtx, iniciado = false;
-        let mouseX = 0, mouseY = 0;
-        let targetX = 0, targetY = 0;
+        
+        // Variables de control ultra-suave
+        let rotacionX = 0, rotacionY = 0;
+        let targetRotacionX = 0, targetRotacionY = 0;
+        let mouseX Anterior = 0, mouseYAnterior = 0;
+        let tocando = false;
 
         const BASE_PALABRAS = [
             "Te amo", "Hermosa", "Mi niña", "Kimberly", "Preciosa", "Mi vida", 
@@ -202,34 +206,25 @@
             }
             escena.add(grupoPalabras);
 
-            window.addEventListener('touchstart', onTouch, {passive: true});
-            window.addEventListener('touchmove', onTouchMove, {passive: true});
-            window.addEventListener('mousedown', onTouch);
-            window.addEventListener('mousemove', onMouseMove);
+            // NUEVO SISTEMA DE ARRASTRE SEGURO Y CONTROLADO
+            window.addEventListener('mousedown', empiezaInteraccion);
+            window.addEventListener('mousemove', mueveInteraccion);
+            window.addEventListener('mouseup', terminaInteraccion);
+
+            window.addEventListener('touchstart', (e) => empiezaInteraccion(e.touches[0]), {passive: true});
+            window.addEventListener('touchmove', (e) => mueveInteraccion(e.touches[0]), {passive: true});
+            window.addEventListener('touchend', terminaInteraccion);
         }
 
-        // SENSIBILIDAD CONTROLADA: Reducido drásticamente el multiplicador (de 0.03 a 0.003) para movimientos finos
-        function onTouchMove(e) {
-            if(e.touches.length > 0) {
-                targetX = (e.touches[0].clientX - window.innerWidth / 2) * 0.003;
-                targetY = (e.touches[0].clientY - window.innerHeight / 2) * 0.003;
-            }
-        }
+        function empiezaInteraccion(e) {
+            tocando = true;
+            mouseXAnterior = e.clientX;
+            mouseYAnterior = e.clientY;
 
-        function onMouseMove(e) {
-            targetX = (e.clientX - window.innerWidth / 2) * 0.002;
-            targetY = (e.clientY - window.innerHeight / 2) * 0.002;
-        }
-
-        function onTouch(e) {
+            // Verificar si tocó el Sol al inicio del toque
             const mouse = new THREE.Vector2();
-            if(e.touches && e.touches.length > 0) {
-                mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
-            } else {
-                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-            }
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
             const raycaster = new THREE.Raycaster();
             raycaster.setFromCamera(mouse, camara);
@@ -241,6 +236,28 @@
             }
         }
 
+        function mueveInteraccion(e) {
+            if (!tocando) return;
+            
+            // Calculamos la distancia real que movió el dedo
+            const deltaX = e.clientX - mouseXAnterior;
+            const deltaY = e.clientY - mouseYAnterior;
+
+            // FILTRO DE SENSIBILIDAD: Multiplicador extremadamente bajo (0.0015) para máxima suavidad
+            targetRotacionY += deltaX * 0.0015;
+            targetRotacionX += deltaY * 0.0015;
+
+            // Límites para evitar giros bruscos en el eje vertical
+            targetRotacionX = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, targetRotacionX));
+
+            mouseXAnterior = e.clientX;
+            mouseYAnterior = e.clientY;
+        }
+
+        function terminaInteraccion() {
+            tocando = false;
+        }
+
         function cerrarCarta() {
             document.getElementById('carta').classList.add('oculto');
         }
@@ -248,16 +265,17 @@
         function animate() {
             requestAnimationFrame(animate);
             
-            // Rotación base automática muy sutil y tranquila
-            grupoPalabras.rotation.y += 0.001;
-            grupoPalabras.rotation.x += 0.0003;
+            // Rotación automática súper fina e imperceptible de fondo
+            grupoPalabras.rotation.y += 0.0007;
 
-            // Inercia amortiguada (0.02) para un frenado lento y elegante tipo espacio real
-            mouseX += (targetX - mouseX) * 0.02;
-            mouseY += (targetY - mouseY) * 0.02;
-            grupoPalabras.rotation.y += mouseX * 0.05;
-            grupoPalabras.rotation.x += mouseY * 0.05;
+            // Efecto Amortiguador (Lerp): El movimiento persigue al dedo muy suavemente
+            rotacionY += (targetRotacionY - rotacionY) * 0.06;
+            rotacionX += (targetRotacionX - rotacionX) * 0.06;
 
+            grupoPalabras.rotation.y = rotacionY;
+            grupoPalabras.rotation.x = rotacionX;
+
+            // Animación de latido sutil en el sol
             const escalaSol = 1 + Math.sin(Date.now() * 0.0025) * 0.06;
             sol.scale.set(escalaSol, escalaSol, escalaSol);
 
