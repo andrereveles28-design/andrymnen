@@ -30,7 +30,7 @@
             background: linear-gradient(45deg, #ff758c, #ff7eb3); border: none; 
             padding: 18px 45px; color: white; border-radius: 50px; font-size: 1.1rem; 
             font-weight: 600; box-shadow: 0 10px 30px rgba(255, 117, 140, 0.4); cursor: pointer; 
-            transition: transform 0.2s;
+            transition: transform 0.2s; z-index: 35;
         }
         #btn-entrar:active { transform: scale(0.95); }
 
@@ -38,7 +38,7 @@
             position: absolute; bottom: 30px; width: 100%; text-align: center; 
             color: rgba(255, 255, 255, 0.35); font-size: 0.75rem; letter-spacing: 3px; 
             z-index: 10; pointer-events: none; text-transform: uppercase;
-            animation: flotarGuia 2s infinite ease-in-out;
+            animation: flotarGuia 2s infinite ease-in-out; display: none;
         }
 
         #carta { 
@@ -117,10 +117,9 @@
         let escena, camara, render, sol, grupoPalabras;
         let audioCtx, iniciado = false;
         
-        // Variables de control ultra-suave
         let rotacionX = 0, rotacionY = 0;
         let targetRotacionX = 0, targetRotacionY = 0;
-        let mouseX Anterior = 0, mouseYAnterior = 0;
+        let mouseXAnterior = 0, mouseYAnterior = 0;
         let tocando = false;
 
         const BASE_PALABRAS = [
@@ -132,7 +131,9 @@
         ];
 
         function comenzar() {
+            iniciado = true;
             document.getElementById('pantalla-inicio').style.opacity = '0';
+            document.getElementById('guia').style.display = 'block';
             setTimeout(() => document.getElementById('pantalla-inicio').remove(), 1000);
             
             init3D();
@@ -206,7 +207,6 @@
             }
             escena.add(grupoPalabras);
 
-            // NUEVO SISTEMA DE ARRASTRE SEGURO Y CONTROLADO
             window.addEventListener('mousedown', empiezaInteraccion);
             window.addEventListener('mousemove', mueveInteraccion);
             window.addEventListener('mouseup', terminaInteraccion);
@@ -217,11 +217,11 @@
         }
 
         function empiezaInteraccion(e) {
+            if (!iniciado) return;
             tocando = true;
             mouseXAnterior = e.clientX;
             mouseYAnterior = e.clientY;
 
-            // Verificar si tocó el Sol al inicio del toque
             const mouse = new THREE.Vector2();
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -237,17 +237,13 @@
         }
 
         function mueveInteraccion(e) {
-            if (!tocando) return;
+            if (!tocando || !iniciado) return;
             
-            // Calculamos la distancia real que movió el dedo
             const deltaX = e.clientX - mouseXAnterior;
             const deltaY = e.clientY - mouseYAnterior;
 
-            // FILTRO DE SENSIBILIDAD: Multiplicador extremadamente bajo (0.0015) para máxima suavidad
             targetRotacionY += deltaX * 0.0015;
             targetRotacionX += deltaY * 0.0015;
-
-            // Límites para evitar giros bruscos en el eje vertical
             targetRotacionX = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, targetRotacionX));
 
             mouseXAnterior = e.clientX;
@@ -265,17 +261,14 @@
         function animate() {
             requestAnimationFrame(animate);
             
-            // Rotación automática súper fina e imperceptible de fondo
             grupoPalabras.rotation.y += 0.0007;
 
-            // Efecto Amortiguador (Lerp): El movimiento persigue al dedo muy suavemente
             rotacionY += (targetRotacionY - rotacionY) * 0.06;
             rotacionX += (targetRotacionX - rotacionX) * 0.06;
 
             grupoPalabras.rotation.y = rotacionY;
             grupoPalabras.rotation.x = rotacionX;
 
-            // Animación de latido sutil en el sol
             const escalaSol = 1 + Math.sin(Date.now() * 0.0025) * 0.06;
             sol.scale.set(escalaSol, escalaSol, escalaSol);
 
