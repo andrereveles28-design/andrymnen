@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para mi niña 🥺</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;600&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Quicksand', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #020208; user-select: none; }
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+
+        #pantalla-inicio { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            background: radial-gradient(circle, #050518 0%, #010105 100%);
+            z-index: 30; transition: opacity 1s ease; padding: 30px; text-align: center; 
+        }
+        #pantalla-inicio h1 { 
+            font-family: 'Playfair Display', serif; font-size: 2.6rem; color: #ff758c; 
+            margin-bottom: 20px; text-shadow: 0 0 20px rgba(255, 117, 140, 0.6); 
+        }
+        #pantalla-inicio p { 
+            color: #d1d1e0; font-size: 1.1rem; margin-bottom: 40px; 
+            max-width: 420px; line-height: 1.6; font-style: italic; 
+        }
+        #btn-entrar { 
+            background: linear-gradient(45deg, #ff758c, #ff7eb3); border: none; 
+            padding: 18px 45px; color: white; border-radius: 50px; font-size: 1.1rem; 
+            font-weight: 600; box-shadow: 0 10px 30px rgba(255, 117, 140, 0.4); cursor: pointer; 
+            transition: transform 0.2s; z-index: 35; position: relative;
+        }
+        #btn-entrar:active { transform: scale(0.95); }
+
+        #guia { 
+            position: absolute; bottom: 30px; width: 100%; text-align: center; 
+            color: rgba(255, 255, 255, 0.35); font-size: 0.75rem; letter-spacing: 3px; 
+            z-index: 10; pointer-events: none; text-transform: uppercase;
+            animation: flotarGuia 2s infinite ease-in-out; display: none;
+        }
+
+        #carta { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            display: flex; justify-content: center; align-items: center; 
+            background: rgba(2, 2, 8, 0.75); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            z-index: 40; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; 
+        }
+        .oculto { opacity: 0; pointer-events: none; transform: scale(0.92); }
+        
+        .contenedor-carta { 
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.09); 
+            padding: 35px 25px; border-radius: 28px; max-width: 440px; width: 100%; 
+            text-align: center; color: white; box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+            max-height: 82vh; overflow-y: auto;
+        }
+        .contenedor-carta h2 { font-weight: 600; color: #ff758c; margin-bottom: 20px; font-size: 1.6rem; }
+        .contenedor-carta p { font-weight: 300; font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px; color: #d1d1e0; text-align: justify; }
+        
+        .btn-cerrar { 
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); 
+            color: white; padding: 12px 35px; border-radius: 50px; margin-top: 15px; cursor: pointer; 
+            font-weight: 600; font-size: 0.85rem;
+        }
+        .btn-cerrar:active { background: rgba(255, 255, 255, 0.18); }
+
+        @keyframes flotarGuia { 0%, 100% { opacity: 0.2; transform: translateY(0); } 50% { opacity: 0.6; transform: translateY(-4px); } }
+    </style>
+</head>
+<body>
+
+    <div id="pantalla-inicio">
+        <h1>Para mi niña 🥺</h1>
+        <p>"Desde que te conocí sabía que tú serías el centro de mi universo y lo más bello"</p>
+        <button id="btn-entrar" onclick="comenzar()">Encender mi universo</button>
+    </div>
+
+    <div id="guia">Desliza para explorar • Toca el Sol del centro</div>
+
+    <div id="carta" class="oculto">
+        <div class="contenedor-carta">
+            <h2>Kimberly, mi niña hermosa ✨</h2>
+            <p>Este universo en 3D que ves aquí es una pequeña representación de cómo me siento contigo. No importa hacia dónde mires, siempre hay algo que me recuerda a ti.</p>
+            
+            <div style="display: flex; align-items: center; justify-content: center; margin: 20px 0;">
+                <div style="flex: 1; height: 1px; background: linear-gradient(to right, transparent, rgba(255,117,140,0.4), transparent);"></div>
+                <span style="color: #ff758c; margin: 0 12px; font-size: 1.2rem; filter: drop-shadow(0 0 5px #ff758c);">❤️</span>
+                <div style="flex: 1; height: 1px; background: linear-gradient(to right, transparent, rgba(255,117,140,0.4), transparent);"></div>
+            </div>
+
+            <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 15px; border-radius: 14px; margin-bottom: 15px; text-align: left;">
+                <strong style="color: #ff7eb3; display: block; margin-bottom: 5px; font-size: 0.95rem;">🌌 Mi lugar favorito:</strong>
+                <p style="font-size: 0.85rem; color: #d1d1e0; margin: 0;">Cualquier rincón del mundo, siempre y cuando sea a tu lado. Gracias por iluminar mis días con tu hermosa sonrisa.</p>
+            </div>
+
+            <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 15px; border-radius: 14px; margin-bottom: 20px; text-align: left;">
+                <strong style="color: #8ec5fc; display: block; margin-bottom: 5px; font-size: 0.95rem;">✨ Lo que eres para mí:</strong>
+                <p style="font-size: 0.85rem; color: #d1d1e0; margin: 0;">Eres mi centro de gravedad y la única razón por la que este gran cosmos digital se mueve hoy.</p>
+            </div>
+
+            <p style="text-align: center; font-weight: 600; color: #ff758c; margin-bottom: 10px;">Mis promesas para ti:</p>
+
+            <ul style="list-style: none; padding: 0; text-align: left; margin: 0 0 20px 0;">
+                <li style="margin-bottom: 10px; font-size: 0.9rem; color: #d1d1e0;"><span style="color: #ff758c; margin-right: 8px;">✦</span> Estar contigo en tus días más brillantes y apoyarte en los nublados.</li>
+                <li style="margin-bottom: 10px; font-size: 0.9rem; color: #d1d1e0;"><span style="color: #ff758c; margin-right: 8px;">✦</span> Cuidar siempre de este cariño tan bonito que te tengo.</li>
+                <li style="margin-bottom: 10px; font-size: 0.9rem; color: #d1d1e0;"><span style="color: #ff758c; margin-right: 8px;">✦</span> Recordarte cada día lo valiosa y hermosa que eres.</li>
+            </ul>
+
+            <p style="text-align: center; font-size: 0.9rem; color: #b0b0c5; font-style: italic;">Te amo de aquí al infinito, ida y vuelta. 🪐</p>
+
+            <button class="btn-cerrar" onclick="cerrarCarta()">Volver al espacio</button>
+        </div>
+    </div>
+
+    <script>
+        let escena, camara, render, sol, grupoPalabras;
+        let audioCtx, iniciado = false;
+        
+        let rotacionX = 0, rotacionY = 0;
+        let targetRotacionX = 0, targetRotacionY = 0;
+        let mouseXAnterior = 0, mouseYAnterior = 0;
+        let tocando = false;
+
+        const BASE_PALABRAS = [
+            "Te amo", "Hermosa", "Mi niña", "Kimberly", "Preciosa", "Mi vida", 
+            "Mía", "Siempre", "Ternura", "Mi cielo", "Princesa", "Amor", 
+            "Única", "Bella", "Dulzura", "Perfecta", "Corazón", "Magia",
+            "Luz", "Mi todo", "Tesoro", "Estrella", "Destino", "Te adoro",
+            "Sueño", "Realidad", "Besos", "Mundo", "Bonita", "Mi sol", "Te extraño"
+        ];
+
+        function comenzar() {
+            if (iniciado) return;
+            iniciado = true;
+            document.getElementById('pantalla-inicio').style.opacity = '0';
+            document.getElementById('guia').style.display = 'block';
+            setTimeout(() => {
+                const elem = document.getElementById('pantalla-inicio');
+                if(elem) elem.remove();
+            }, 1000);
+            
+            init3D();
+            iniciarMusica();
+            animate();
+        }
+
+        function init3D() {
+            escena = new THREE.Scene();
+            escena.fog = new THREE.FogExp2(0x020208, 0.015);
+
+            camara = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camara.position.z = 24;
+
+            render = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            render.setSize(window.innerWidth, window.innerHeight);
+            render.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.body.appendChild(render.domElement);
+
+            const geoSol = new THREE.SphereGeometry(2.2, 32, 32);
+            const matSol = new THREE.MeshBasicMaterial({ color: 0xff758c });
+            sol = new THREE.Mesh(geoSol, matSol);
+            escena.add(sol);
+
+            const luzPunto = new THREE.PointLight(0xff7eb3, 3, 40);
+            luzPunto.position.set(0, 0, 0);
+            escena.add(luzPunto);
+
+            grupoPalabras = new THREE.Group();
+            const cantidadTotal = 750;
+
+            const texturasCachadas = BASE_PALABRAS.map(txt => {
+                const canvasTex = document.createElement('canvas');
+                const conf = canvasTex.getContext('2d');
+                canvasTex.width = 256;
+                canvasTex.height = 64;
+                conf.font = "bold 34px 'Quicksand', sans-serif";
+                conf.fillStyle = "rgba(255, 255, 255, 0.9)";
+                conf.textAlign = "center";
+                conf.shadowColor = "#ff7eb3";
+                conf.shadowBlur = 4;
+                conf.fillText(txt, 128, 42);
+                return new THREE.CanvasTexture(canvasTex);
+            });
+
+            for (let i = 0; i < cantidadTotal; i++) {
+                const texAleatoria = texturasCachadas[Math.floor(Math.random() * texturasCachadas.length)];
+                const matSprite = new THREE.SpriteMaterial({ 
+                    map: texAleatoria, 
+                    transparent: true,
+                    opacity: 0.45 + Math.random() * 0.55
+                });
+                const sprite = new THREE.Sprite(matSprite);
+
+                const radioOrbita = 6.5 + Math.random() * 12; 
+                const u = Math.random();
+                const v = Math.random();
+                const theta = u * 2.0 * Math.PI;
+                const phi = Math.acos(2.0 * v - 1.0);
+
+                sprite.position.set(
+                    radioOrbita * Math.sin(phi) * Math.cos(theta),
+                    radioOrbita * Math.sin(phi) * Math.sin(theta),
+                    radioOrbita * Math.cos(phi)
+                );
+
+                const factorEscala = 1.2 + Math.random() * 0.6;
+                sprite.scale.set(factorEscala, factorEscala * 0.25, 1);
+                
+                grupoPalabras.add(sprite);
+            }
+            escena.add(grupoPalabras);
+
+            window.addEventListener('mousedown', empiezaInteraccion);
+            window.addEventListener('mousemove', mueveInteraccion);
+            window.addEventListener('mouseup', terminaInteraccion);
+
+            window.addEventListener('touchstart', (e) => empiezaInteraccion(e.touches[0]), {passive: true});
+            window.addEventListener('touchmove', (e) => mueveInteraccion(e.touches[0]), {passive: true});
+            window.addEventListener('touchend', terminaInteraccion);
+        }
+
+        function empiezaInteraccion(e) {
+            if (!iniciado) return;
+            tocando = true;
+            mouseXAnterior = e.clientX;
+            mouseYAnterior = e.clientY;
+
+            const mouse = new THREE.Vector2();
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, camara);
+            const intersectado = raycaster.intersectObject(sol);
+
+            if (intersectado.length > 0) {
+                document.getElementById('carta').classList.remove('oculto');
+                sonarCampana();
+            }
+        }
+
+        function mueveInteraccion(e) {
+            if (!tocando || !iniciado) return;
+            
+            const deltaX = e.clientX - mouseXAnterior;
+            const deltaY = e.clientY - mouseYAnterior;
+
+            targetRotacionY += deltaX * 0.0015;
+            targetRotacionX += deltaY * 0.0015;
+            targetRotacionX = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, targetRotacionX));
+
+            mouseXAnterior = e.clientX;
+            mouseYAnterior = e.clientY;
+        }
+
+        function terminaInteraccion() {
+            tocando = false;
+        }
+
+        function cerrarCarta() {
+            document.getElementById('carta').classList.add('oculto');
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            grupoPalabras.rotation.y += 0.0007;
+
+            rotacionY += (targetRotacionY - rotacionY) * 0.06;
+            rotacionX += (targetRotacionX - rotacionX) * 0.06;
+
+            grupoPalabras.rotation.y = rotacionY;
+            grupoPalabras.rotation.x = rotacionX;
+
+            const escalaSol = 1 + Math.sin(Date.now() * 0.0025) * 0.06;
+            sol.scale.set(escalaSol, escalaSol, escalaSol);
+
+            render.render(escena, camara);
+        }
+
+        function iniciarMusica() {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            bucleMelodia();
+        }
+
+        function tocarNota(freq, inicio, duracion, vol) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, inicio);
+            gain.gain.setValueAtTime(0, inicio);
+            gain.gain.linearRampToValueAtTime(vol, inicio + 0.15);
+            gain.gain.exponentialRampToValueAtTime(0.0001, inicio + duracion);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(inicio);
+            osc.stop(inicio + duracion);
+        }
+
+        function bucleMelodia() {
+            const tiempo = audioCtx.currentTime;
+            const progresion = [
+                [261.63, 329.63, 392.00], 
+                [220.00, 329.63, 440.00], 
+                [174.61, 349.23, 440.00], 
+                [196.00, 293.66, 392.00]  
+            ];
+            
+            progresion.forEach((acorde, idx) => {
+                let tiempoAcorde = tiempo + (idx * 2.0);
+                acorde.forEach((nota, nIdx) => {
+                    tocarNota(nota, tiempoAcorde + (nIdx * 0.12), 2.8, 0.04);
+                });
+                if(idx === 0) tocarNota(523.25, tiempoAcorde + 0.5, 1.8, 0.02);
+                if(idx === 2) tocarNota(659.25, tiempoAcorde + 0.5, 1.8, 0.02);
+            });
+
+            setTimeout(bucleMelodia, 8000);
+        }
+
+        function sonarCampana() {
+            if(!audioCtx) return;
+            tocarNota(523.25, audioCtx.currentTime, 2, 0.05);
+            tocarNota(659.25, audioCtx.currentTime + 0.1, 2, 0.05);
+        }
+
+        window.addEventListener('resize', () => {
+            if(!render) return;
+            camara.aspect = window.innerWidth / window.innerHeight;
+            camara.updateProjectionMatrix();
+            render.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
